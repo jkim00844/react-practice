@@ -22,7 +22,7 @@ function LandingPage() {
         fetch(endpoint)
         .then(response => response.json())
         .then(response => {
-            console.log(response);
+            // console.log(response);
             // useState 에 Movies 추가
             // setMovies(...[response.results]) -> 새로운 데이터가 들어오면 덮어 씌워짐.
             // 이건 데이터 추가됨
