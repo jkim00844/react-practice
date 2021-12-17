@@ -4,6 +4,7 @@ import MainImage from '../LandingPage/Sections/MainImage';
 import MovieInfo from './Sections/MovieInfo';
 import GridCards from '../commons/GridCard';
 import { Row } from 'antd';
+import Favorite from './Sections/Favorite';
 
 // http://localhost:3000/movie/580489
 
@@ -11,7 +12,7 @@ function MovieDetail(props) {
 
     let movieId = props.match.params.movieId
 
-    const [Moive, setMoive] = useState([])
+    const [Movie, setMovie] = useState([])
     const [Casts, setCasts] = useState([])
     const [ActorToggle, setActorToggle] = useState(false)
 
@@ -25,13 +26,13 @@ function MovieDetail(props) {
             .then(response => response.json())
             .then(response => {
                 // console.log(response)
-                setMoive(response)
+                setMovie(response)
             })
             
         fetch(endpointCrew)
             .then(response => response.json())
             .then(response => {
-                console.log('responseforcrew', response.cast)
+                // console.log('responseforcrew', response.cast)
                 setCasts(response.cast)
             })
     }, [])
@@ -44,16 +45,26 @@ function MovieDetail(props) {
 
             {/*Header */}
             <MainImage 
-                image={`${IMAGE_BASE_URL}w1280${Moive.backdrop_path}`}
-                title={Moive.original_title}
-                text={Moive.overview}
+                image={`${IMAGE_BASE_URL}w1280${Movie.backdrop_path}`}
+                title={Movie.original_title}
+                text={Movie.overview}
             /> 
 
             {/*Body */}
             <div style={{ width: '85%', margin: '1rem auto'}}>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Favorite
+                        movieInfo = {Movie}
+                        movieId = {movieId}
+                        // 로그인하면 userId가 localStorage에 들어있음
+                        userFrom = {localStorage.getItem('userId')}
+                    />
+                </div>
+
                 {/*Movie Info */}
                 <MovieInfo
-                    movie = {Moive}
+                    movie = {Movie}
                 />
                 <br />
 
