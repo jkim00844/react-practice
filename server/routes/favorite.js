@@ -31,4 +31,29 @@ router.post('/favorited', (req, res) => {
         })
 })
 
+// 좋아요 추가
+router.post('/addToFavorite', (req, res) => {
+
+    const favorite = new Favorite(req.body);
+
+    // insert into favorite
+    favorite.save((err, doc) => {
+        if(err) return res.status(400).send(err);
+
+        return res.status(200).json({success:true});
+    })
+})
+
+// 좋아요 해제
+router.post('/removeFromFavorite', (req, res) => {
+
+    // delete from Favorite f where f.movieId = movieId, f.userFrom = userFrom;
+    Favorite.findOneAndDelete({ movieId: req.body.movieId , userFrom: req.body.userFrom })
+        .exec((err, doc)=>{
+            if(err) return res.status(400).send(err);
+            res.status(200).json({ success: true, doc })
+        })
+
+})
+
 module.exports = router;
