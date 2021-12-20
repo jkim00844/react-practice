@@ -4,6 +4,7 @@ const router = express.Router();
 
 const { auth } = require("../middleware/auth");
 const multer = require("multer");
+const ffmpeg = require("fluent-ffmpeg")
 
 //=================================
 //             Video
@@ -28,7 +29,6 @@ let storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single("file")
 
 
-
 // index.js에서 prefix로 /api/video 붙였음.
 router.post("/uploadfiles", (req, res) => {
 
@@ -39,6 +39,44 @@ router.post("/uploadfiles", (req, res) => {
       }
 
       return res.json({ success: true, url: res.req.file.path, fileName: res.req.file.filename })
+  })
+});
+
+router.post("/thumbnail", (req, res) => {
+
+  let thumbsFilePath ="";
+  let fileDuration ="";
+
+  ffmpeg.ffprobe(req.body.url, function(err, metadata){
+      console.dir(metadata);
+      console.log(metadata.format.duration);
+
+      fileDuration = metadata.format.duration;
+  })
+
+
+  // 썸네일 생성
+  ffmpeg(req.body.url) // 비디오가 저장된 경로
+  .on('filenames', function(filenames) { // filenames은 썸네일 파일 이름
+    console.log(filenames);
+    console.log('will generate ' + filenames.join(', '));
+
+    filePath = "uploads/thumbnails/" + filenames[0];
+  })
+  .on('end', function() {
+    console.log('Screenshots taken')
+    return res.json({ success: true, url: filePath, fileDuration: fileDuration })
+  })
+  .on('err', function(err) {
+    console.error(err)
+    return res.json({ success: false, err });
+  })
+  .screenshots({
+    count: 3, // 썸네일 3개 저장. Will take screens at 20%, 40%, 60% and 80% of the video
+    folder: 'uploads/thumbnails',
+    size:'320x240',
+    // %b: input basename (filename w/o extension)
+    filename: 'thumbnail-%b.png'
   })
 });
 
